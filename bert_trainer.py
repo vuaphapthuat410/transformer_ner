@@ -3,7 +3,7 @@ from sklearn.metrics import classification_report, f1_score
 from transformers import BertTokenizerFast, Trainer, TrainingArguments
 from transformers.trainer_utils import IntervalStrategy
 
-from models import BertCRF
+from models import BertForTokenClassification
 
 task = "ner" # Should be one of "ner", "pos" or "chunk"
 model_checkpoint = "microsoft/Multilingual-MiniLM-L12-H384"
@@ -67,7 +67,7 @@ id2label = {
 
 from transformers import AutoModelForTokenClassification, TrainingArguments, Trainer, AutoConfig
 config = AutoConfig.from_pretrained(model_checkpoint, label2id=label2id, id2label=id2label, num_labels=len(label_list), classifier_dropout=0.2)
-model = BertCRF.from_pretrained(model_checkpoint, config = config)
+model = BertForTokenClassification.from_pretrained(model_checkpoint, config = config)
 
 from transformers import XLMRobertaTokenizerFast
     
@@ -151,10 +151,10 @@ training_args = TrainingArguments(
     warmup_steps = 100,
     eval_steps = 100,
     save_steps=100,
-    save_total_limit = 10,
+    save_total_limit = 15,
     metric_for_best_model = 'eval_loss',
     load_best_model_at_end=True,
-    learning_rate=3e-5,
+    learning_rate=1e-5,
 )
 
 trainer = Trainer(

@@ -111,7 +111,7 @@ def tokenize(batch):
         result['label_ids'].append(label_ids)
         result['token_type_ids'].append(token_type_ids)
 
-    result = tokenizer.pad(result, padding='longest', max_length=max_length, return_attention_mask=True)
+    result = tokenizer.pad(result, padding='max_length', max_length=max_length, return_attention_mask=True)
     for i in range(len(result['input_ids'])):
         diff = len(result['input_ids'][i]) - len(result['label_ids'][i])
         result['label_ids'][i] += [0] * diff
@@ -141,16 +141,16 @@ def compute_metrics(pred):
 
 training_args = TrainingArguments(
     output_dir='./results',
-    num_train_epochs=15,
-    per_device_train_batch_size=64,
-    per_device_eval_batch_size=64,
+    num_train_epochs=10,
+    per_device_train_batch_size=20,
+    per_device_eval_batch_size=20,
     # weight_decay=0.01,
     # save_strategy=IntervalStrategy.EPOCH,
     logging_dir='./logs',
     evaluation_strategy ='steps',
-    warmup_steps = 100,
-    eval_steps = 100,
-    save_steps=100,
+    warmup_steps = 500,
+    eval_steps = 250,
+    save_steps=250,
     save_total_limit = 10,
     metric_for_best_model = 'eval_loss',
     load_best_model_at_end=True,

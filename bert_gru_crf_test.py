@@ -1,7 +1,7 @@
 from transformers import XLMRobertaTokenizerFast
-from models import BertCRF
+from models import BertGRUCRF
 
-model = BertCRF.from_pretrained('../drive/MyDrive/NLP/MiniLM/MiniLM-L12-H384-VI-CRF', num_labels=9)
+model = BertGRUCRF.from_pretrained('../drive/MyDrive/NLP/MiniLM/MiniLM-GRU-CRF', num_labels=9)
 tokenizer = XLMRobertaTokenizerFast.from_pretrained("microsoft/Multilingual-MiniLM-L12-H384", do_lower_case=False)
 id2label = ["O", "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "B-MISC", "I-MISC"]
 
@@ -24,8 +24,7 @@ def decode(label_ids, input_ids, offsets_mapping, id2label):
             else:
                 words.append(word)
                 labels.append(id2label[int(label_ids[k][i])])
-        
-        result.append([])
+
         for word, tag in zip(words, labels):
             result[k].append({'word': word, 'tag': tag})
                 

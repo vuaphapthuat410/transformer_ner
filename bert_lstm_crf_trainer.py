@@ -3,7 +3,7 @@ from sklearn.metrics import classification_report, f1_score
 from transformers import BertTokenizerFast, Trainer, TrainingArguments
 from transformers.trainer_utils import IntervalStrategy
 
-from models import BertCRF
+from models import BertLstmCRF
 
 task = "ner" # Should be one of "ner", "pos" or "chunk"
 model_checkpoint = "microsoft/Multilingual-MiniLM-L12-H384"
@@ -66,8 +66,8 @@ id2label = {
   }
 
 from transformers import AutoModelForTokenClassification, TrainingArguments, Trainer, AutoConfig
-config = AutoConfig.from_pretrained(model_checkpoint, label2id=label2id, id2label=id2label, num_labels=len(label_list), classifier_dropout=0.2)
-model = BertCRF.from_pretrained(model_checkpoint, config = config)
+config = AutoConfig.from_pretrained(model_checkpoint, label2id=label2id, id2label=id2label, num_labels=len(label_list))
+model = BertLstmCRF.from_pretrained(model_checkpoint, config = config)
 
 from transformers import XLMRobertaTokenizerFast
     
@@ -141,20 +141,18 @@ def compute_metrics(pred):
 
 training_args = TrainingArguments(
     output_dir='./results',
-    num_train_epochs=15,
-    per_device_train_batch_size=64,
-    per_device_eval_batch_size=64,
-    # weight_decay=0.01,
+    num_train_epochs=8,
+    per_device_train_batch_size=32,
+    per_device_eval_batch_size=32,
+    weight_decay=0.01,
     # save_strategy=IntervalStrategy.EPOCH,
     logging_dir='./logs',
     evaluation_strategy ='steps',
-    warmup_steps = 100,
-    eval_steps = 100,
-    save_steps=100,
+    eval_steps = 250,
+    save_steps= 250,
     save_total_limit = 10,
     metric_for_best_model = 'eval_loss',
     load_best_model_at_end=True,
-    learning_rate=3e-5,
 )
 
 trainer = Trainer(
@@ -163,7 +161,7 @@ trainer = Trainer(
     compute_metrics=compute_metrics,
     train_dataset=train_dataset,
     eval_dataset=test_dataset,
-    # callbacks = [EarlyStoppingCallback(early_stopping_patience=3)],
+    callbacks = [EarlyStoppingCallback(early_stopping_patience=3)],
 )
 
 trainer.train()
